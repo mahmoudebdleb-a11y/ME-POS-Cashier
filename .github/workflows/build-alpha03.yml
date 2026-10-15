@@ -26,7 +26,8 @@ jobs:
       - name: Reassemble Alpha 03 source
         shell: bash
         run: |
-          cat alpha03.parts/part01.b64 alpha03.parts/part02.b64 alpha03.parts/part03.b64 alpha03.parts/part04a.b64 alpha03.parts/part04b.b64 > /tmp/alpha03.b64
+          cat alpha03.parts/part01.b64 alpha03.parts/part02.b64 alpha03.parts/part03.b64 alpha03.parts/part04a.b64 alpha03.parts/part04b.b64 | tr -d '[:space:]' > /tmp/alpha03.b64
+          test "$(wc -c < /tmp/alpha03.b64)" -eq 25628
           base64 --decode /tmp/alpha03.b64 > /tmp/ME-POS-Cashier-alpha03.zip
           echo "ac19f23f8a3ef4357ca6b552b05b6724c6fedfe876d1b7917c93f8c95c9d241e  /tmp/ME-POS-Cashier-alpha03.zip" | sha256sum -c -
           rm -rf build-src
