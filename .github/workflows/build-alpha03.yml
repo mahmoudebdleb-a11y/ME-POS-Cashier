@@ -28,7 +28,7 @@ jobs:
         run: |
           rm -rf build-src
           mkdir -p build-src
-          base64 --decode ME-POS-Cashier-alpha03.zip.b64 > /tmp/ME-POS-Cashier-alpha03.zip
+          base64 --decode --ignore-garbage ME-POS-Cashier-alpha03.zip.b64 > /tmp/ME-POS-Cashier-alpha03.zip
           unzip -q /tmp/ME-POS-Cashier-alpha03.zip -d build-src
           test -f build-src/settings.gradle
           test -f build-src/app/build.gradle
