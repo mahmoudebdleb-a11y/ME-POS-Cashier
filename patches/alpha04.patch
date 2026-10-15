@@ -1,0 +1,63 @@
+--- a/app/build.gradle
++++ b/app/build.gradle
+@@ -8,8 +8,8 @@
+         applicationId 'com.mahmoud.meposcashier'
+         minSdk 22
+         targetSdk 36
+-        versionCode 3
+-        versionName '1.0.0-alpha03'
++        versionCode 4
++        versionName '1.0.0-alpha04'
+     }
+ 
+     compileOptions {
+--- a/app/src/main/java/com/mahmoud/meposcashier/CheckoutMath.java
++++ b/app/src/main/java/com/mahmoud/meposcashier/CheckoutMath.java
+@@ -13,6 +13,18 @@
+         return Math.addExact(Math.multiplyExact(subtotalMinor,(long)taxBps),5000L)/10000L;
+     }
+     public static long total(long subtotalMinor,int taxBps){ return Math.addExact(subtotalMinor,tax(subtotalMinor,taxBps)); }
++    public static int addRequestedQty(int accumulated,int qty){
++        if(accumulated<0) throw new IllegalArgumentException("الكمية المجمعة غير صحيحة");
++        if(qty<=0) throw new IllegalArgumentException("الكمية غير صحيحة");
++        long total=(long)accumulated+qty;
++        if(total>Integer.MAX_VALUE) throw new IllegalStateException("الكمية أكبر من الحد المسموح");
++        return (int)total;
++    }
++    public static void requireStock(int available,int requested){
++        if(available<0) throw new IllegalArgumentException("الرصيد غير صحيح");
++        if(requested<=0) throw new IllegalArgumentException("الكمية المطلوبة غير صحيحة");
++        if(available<requested) throw new IllegalStateException("الرصيد غير كافٍ");
++    }
+     public static int adjustedStock(int current,int delta){
+         long next=(long)current+delta;
+         if(next<0) throw new IllegalStateException("الرصيد غير كافٍ");
+--- a/app/src/main/java/com/mahmoud/meposcashier/PosDb.java
++++ b/app/src/main/java/com/mahmoud/meposcashier/PosDb.java
+@@ -99,8 +99,15 @@
+         if(!Arrays.asList("CASH","CARD","MIXED").contains(paymentMethod)) throw new IllegalArgumentException("طريقة الدفع غير صحيحة");
+         if(taxBps<0||taxBps>10000) throw new IllegalArgumentException("نسبة الضريبة غير صحيحة");
+         SQLiteDatabase db=getWritableDatabase(); db.beginTransaction(); try{
+-            long subtotal=0; Map<String,Product> products=new LinkedHashMap<>();
+-            for(CartLine line:cart){ Product p=findProduct(db,line.productId); if(!p.active) throw new IllegalStateException("المنتج غير متاح: "+p.name); if(line.qty<=0) throw new IllegalArgumentException("كمية غير صحيحة"); if(p.stockQty<line.qty) throw new IllegalStateException("المخزون غير كافٍ: "+p.name); products.put(p.id,p); subtotal = Math.addExact(subtotal,CheckoutMath.lineTotal(p.priceMinor,line.qty)); }
++            long subtotal=0; Map<String,Product> products=new LinkedHashMap<>(); Map<String,Integer> requestedQty=new LinkedHashMap<>();
++            for(CartLine line:cart){
++                Product p=products.get(line.productId);
++                if(p==null){ p=findProduct(db,line.productId); if(!p.active) throw new IllegalStateException("المنتج غير متاح: "+p.name); products.put(p.id,p); }
++                int combined=CheckoutMath.addRequestedQty(requestedQty.containsKey(p.id)?requestedQty.get(p.id):0,line.qty);
++                requestedQty.put(p.id,combined);
++                subtotal = Math.addExact(subtotal,CheckoutMath.lineTotal(p.priceMinor,line.qty));
++            }
++            for(Map.Entry<String,Integer> e:requestedQty.entrySet()){ Product p=products.get(e.getKey()); try{ CheckoutMath.requireStock(p.stockQty,e.getValue()); }catch(IllegalStateException ex){ throw new IllegalStateException("المخزون غير كافٍ: "+p.name); } }
+             long tax=CheckoutMath.tax(subtotal,taxBps); long total=CheckoutMath.total(subtotal,taxBps);
+             int invoice=nextInvoice(db); String saleId=UUID.randomUUID().toString(); long created=now();
+             db.execSQL("INSERT INTO sales VALUES(?,?,?,?,?,?,?)",new Object[]{saleId,invoice,created,paymentMethod,subtotal,tax,total});
+--- a/app/src/test/java/com/mahmoud/meposcashier/CheckoutMathTest.java
++++ b/app/src/test/java/com/mahmoud/meposcashier/CheckoutMathTest.java
+@@ -12,4 +12,6 @@
+     @Test public void acceptsValidStockAdjustment(){ assertEquals(7,CheckoutMath.adjustedStock(5,2)); }
+     @Test(expected=IllegalArgumentException.class) public void rejectsZeroQuantity(){ CheckoutMath.lineTotal(100,0); }
+     @Test(expected=IllegalArgumentException.class) public void rejectsInvalidTax(){ CheckoutMath.tax(1000,10001); }
++    @Test public void aggregatesDuplicateProductQuantities(){ int total=0; total=CheckoutMath.addRequestedQty(total,2); total=CheckoutMath.addRequestedQty(total,2); assertEquals(4,total); }
++    @Test(expected=IllegalStateException.class) public void rejectsCumulativeDuplicateQuantityAboveStock(){ int total=0; total=CheckoutMath.addRequestedQty(total,2); total=CheckoutMath.addRequestedQty(total,2); CheckoutMath.requireStock(3,total); }
+ }
