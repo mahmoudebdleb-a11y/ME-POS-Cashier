@@ -1,4 +1,4 @@
-name: Build ME POS Cashier Alpha 03
+name: Build ME POS Cashier Alpha 04
 
 on:
   push:
@@ -23,7 +23,7 @@ jobs:
         with:
           gradle-version: '8.9'
 
-      - name: Reassemble Alpha 03 source
+      - name: Reassemble verified Alpha 03 baseline
         shell: bash
         run: |
           cat alpha03.parts/part01.b64 alpha03.parts/part02.b64 alpha03.parts/part03.b64 alpha03.parts/part04a.b64 alpha03.parts/part04b.b64 | tr -d '[:space:]' > /tmp/alpha03.b64
@@ -36,6 +36,14 @@ jobs:
           test -f build-src/settings.gradle
           test -f build-src/app/build.gradle
 
+      - name: Apply Alpha 04 stock-safety patch
+        shell: bash
+        run: |
+          cd build-src
+          patch -p1 < ../patches/alpha04.patch
+          grep -q "1.0.0-alpha04" app/build.gradle
+          grep -q "requestedQty" app/src/main/java/com/mahmoud/meposcashier/PosDb.java
+
       - name: Unit tests
         working-directory: build-src
         run: gradle :app:testDebugUnitTest --stacktrace
@@ -47,6 +55,6 @@ jobs:
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: me-pos-cashier-alpha03-debug
+          name: me-pos-cashier-alpha04-debug
           path: build-src/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
