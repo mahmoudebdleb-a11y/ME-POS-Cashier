@@ -1,4 +1,4 @@
-name: Build ME POS Cashier 1.0.5 SUNMI Drawer Test
+name: Build ME POS Cashier 1.0.6 Full Client
 
 on:
   push:
@@ -42,20 +42,27 @@ jobs:
           cd build-src
           patch -p1 < ../patches/alpha04.patch
 
-      - name: Apply proven client 1.0.4 printer hotfix
+      - name: Apply proven SUNMI printer baseline
         shell: bash
         run: |
           python3 patches/client_hotfix_104.py
-          grep -q "1.0.4-client" build-src/app/build.gradle
           grep -q "SunmiPrinter" build-src/app/src/main/java/com/mahmoud/meposcashier/MainActivity.java
-          test -f build-src/app/src/main/java/com/mahmoud/meposcashier/SunmiPrinter.java
 
-      - name: Add SUNMI T2s cash drawer integration
+      - name: Apply proven SUNMI T2s drawer integration
         shell: bash
         run: |
           python3 patches/drawer_hotfix_105.py
-          grep -q "1.0.5-drawer-test" build-src/app/build.gradle
-          grep -q "sunmi.openDrawer()" build-src/app/src/main/java/com/mahmoud/meposcashier/MainActivity.java
+          grep -q "s.openDrawer(null)" build-src/app/src/main/java/com/mahmoud/meposcashier/SunmiPrinter.java
+
+      - name: Apply full client scope 1.0.6
+        shell: bash
+        run: |
+          python3 patches/full_scope_106.py
+          grep -q "1.0.6-client-full" build-src/app/build.gradle
+          grep -q "owner_pin_hash" build-src/app/src/main/java/com/mahmoud/meposcashier/MainActivity.java
+          grep -q "لم تتم الطباعة" build-src/app/src/main/java/com/mahmoud/meposcashier/MainActivity.java
+          grep -q "image_uri" build-src/app/src/main/java/com/mahmoud/meposcashier/PosDb.java
+          grep -q "printReceipt" build-src/app/src/main/java/com/mahmoud/meposcashier/SunmiPrinter.java
           grep -q "s.openDrawer(null)" build-src/app/src/main/java/com/mahmoud/meposcashier/SunmiPrinter.java
           grep -q 's.printText(text+"\\n",null)' build-src/app/src/main/java/com/mahmoud/meposcashier/SunmiPrinter.java
 
@@ -76,6 +83,6 @@ jobs:
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ME-POS-Cashier-1.0.5-SUNMI-T2s-drawer-test
+          name: ME-POS-Cashier-1.0.6-full-client-debug
           path: build-src/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
