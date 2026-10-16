@@ -17,11 +17,9 @@ jobs:
           rm -rf build-src && mkdir build-src && unzip -q /tmp/src.zip -d build-src
           cd build-src
           patch -p1 < ../patches/alpha04.patch
-          echo '=== BUILD.GRADLE ==='
-          cat app/build.gradle
-          echo '=== MAIN ACTIVITY ==='
-          sed -n '1,420p' app/src/main/java/com/mahmoud/meposcashier/MainActivity.java
-          echo '=== POSDB ==='
-          sed -n '1,320p' app/src/main/java/com/mahmoud/meposcashier/PosDb.java
-          echo '=== THERMAL PRINTER ==='
-          cat app/src/main/java/com/mahmoud/meposcashier/ThermalPrinter.java
+          echo '=== ROOT BUILD ==='; cat build.gradle
+          echo '=== SETTINGS ==='; cat settings.gradle
+          echo '=== APP BUILD ==='; cat app/build.gradle
+          echo '=== MAIN ACTIVITY ==='; sed -n '1,420p' app/src/main/java/com/mahmoud/meposcashier/MainActivity.java
+          echo '=== POSDB ==='; sed -n '1,320p' app/src/main/java/com/mahmoud/meposcashier/PosDb.java
+          echo '=== THERMAL PRINTER ==='; cat app/src/main/java/com/mahmoud/meposcashier/ThermalPrinter.java
