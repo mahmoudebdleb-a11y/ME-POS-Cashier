@@ -1,4 +1,4 @@
-name: Build ME POS Cashier 1.0.6 Full Client
+name: Build ME POS Cashier 1.0.7 Full Client Images
 
 on:
   push:
@@ -66,6 +66,58 @@ jobs:
           grep -q "s.openDrawer(null)" build-src/app/src/main/java/com/mahmoud/meposcashier/SunmiPrinter.java
           grep -q 's.printText(text+"\\n",null)' build-src/app/src/main/java/com/mahmoud/meposcashier/SunmiPrinter.java
 
+      - name: Download and bundle 29 product images
+        shell: bash
+        run: |
+          set -euo pipefail
+          D=build-src/app/src/main/res/drawable-nodpi
+          mkdir -p "$D"
+          dl(){
+            id="$1"; tags="$2"; lock="$3"
+            url="https://loremflickr.com/480/320/${tags}?lock=${lock}"
+            echo "Bundling ${id} <- ${tags}"
+            curl -L --fail --retry 4 --retry-delay 2 --connect-timeout 20 --max-time 90 "$url" -o "$D/prod_${id}.jpg"
+            test "$(wc -c < "$D/prod_${id}.jpg")" -gt 4000
+          }
+          dl hot_today coffee 101
+          dl cortado cortado,coffee 102
+          dl turkish turkish,coffee 103
+          dl espresso espresso,coffee 104
+          dl flat_white flatwhite,coffee 105
+          dl americano_hot americano,coffee 106
+          dl cappuccino cappuccino,coffee 107
+          dl latte_client latte,coffee 108
+          dl hot_chocolate hotchocolate,drink 109
+          dl v60 pourover,coffee 110
+          dl cold_today icedcoffee 201
+          dl hibiscus_small hibiscus,drink 202
+          dl hibiscus_large hibiscus,juice 203
+          dl spanish_latte icedlatte,coffee 204
+          dl caramel_latte caramel,icedcoffee 205
+          dl ice_latte icedlatte 206
+          dl ice_americano icedamericano,coffee 207
+          dl matcha_white_mocha matcha,drink 208
+          dl mojito_mix mojito,berry 209
+          dl tea_client tea,hotdrink 210
+          dl tiramisu_blueberry tiramisu,blueberry 301
+          dl tiramisu_classic tiramisu,dessert 302
+          dl tiramisu_coconut tiramisu,coconut 303
+          dl donuts_cake donut,cake 304
+          dl cho_keez cheesecake,dessert 305
+          dl pancake pancake,chocolate 306
+          dl waffle waffle,chocolate 307
+          dl kunafa_cream kunafa,dessert 308
+          dl kunafa_chocolate chocolate,dessert 309
+          test "$(find "$D" -maxdepth 1 -name 'prod_*.jpg' | wc -l)" -eq 29
+
+      - name: Link bundled images to products and bump 1.0.7
+        shell: bash
+        run: |
+          python3 patches/bundled_images_107.py
+          grep -q "1.0.7-client-images" build-src/app/build.gradle
+          grep -q "android.resource://com.mahmoud.meposcashier/drawable/prod_" build-src/app/src/main/java/com/mahmoud/meposcashier/PosDb.java
+          test "$(find build-src/app/src/main/res/drawable-nodpi -maxdepth 1 -name 'prod_*.jpg' | wc -l)" -eq 29
+
       - name: Unit tests
         working-directory: build-src
         run: gradle :app:testDebugUnitTest --stacktrace
@@ -79,10 +131,11 @@ jobs:
         run: |
           test -s build-src/app/build/outputs/apk/debug/app-debug.apk
           sha256sum build-src/app/build/outputs/apk/debug/app-debug.apk
+          unzip -l build-src/app/build/outputs/apk/debug/app-debug.apk | grep -q 'res/drawable-nodpi/prod_'
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ME-POS-Cashier-1.0.6-full-client-debug
+          name: ME-POS-Cashier-1.0.7-full-client-images-debug
           path: build-src/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
