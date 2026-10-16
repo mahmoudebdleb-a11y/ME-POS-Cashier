@@ -1,4 +1,4 @@
-name: Build ME POS Cashier 1.0.4 Client Hotfix
+name: Build ME POS Cashier 1.0.5 SUNMI Drawer Test
 
 on:
   push:
@@ -42,15 +42,22 @@ jobs:
           cd build-src
           patch -p1 < ../patches/alpha04.patch
 
-      - name: Apply urgent client 1.0.4 hotfix
+      - name: Apply proven client 1.0.4 printer hotfix
         shell: bash
         run: |
           python3 patches/client_hotfix_104.py
           grep -q "1.0.4-client" build-src/app/build.gradle
-          grep -q "taxBps=0" build-src/app/src/main/java/com/mahmoud/meposcashier/MainActivity.java
-          grep -q "دفع شبكة" build-src/app/src/main/java/com/mahmoud/meposcashier/MainActivity.java
-          grep -q "تراميسو توت أزرق" build-src/app/src/main/java/com/mahmoud/meposcashier/PosDb.java
+          grep -q "SunmiPrinter" build-src/app/src/main/java/com/mahmoud/meposcashier/MainActivity.java
           test -f build-src/app/src/main/java/com/mahmoud/meposcashier/SunmiPrinter.java
+
+      - name: Add SUNMI T2s cash drawer integration
+        shell: bash
+        run: |
+          python3 patches/drawer_hotfix_105.py
+          grep -q "1.0.5-drawer-test" build-src/app/build.gradle
+          grep -q "sunmi.openDrawer()" build-src/app/src/main/java/com/mahmoud/meposcashier/MainActivity.java
+          grep -q "s.openDrawer(null)" build-src/app/src/main/java/com/mahmoud/meposcashier/SunmiPrinter.java
+          grep -q 's.printText(text+"\\n",null)' build-src/app/src/main/java/com/mahmoud/meposcashier/SunmiPrinter.java
 
       - name: Unit tests
         working-directory: build-src
@@ -69,6 +76,6 @@ jobs:
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ME-POS-Cashier-1.0.4-client-debug
+          name: ME-POS-Cashier-1.0.5-SUNMI-T2s-drawer-test
           path: build-src/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
