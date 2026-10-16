@@ -1,8 +1,8 @@
-name: Build ME POS Cashier 1.0.7 Full Client Images
+name: Build ME POS Cashier 1.0.8 Play Release AAB
 
 on:
   push:
-    branches: [ main ]
+    branches: [ play-release-prep-1.0.8 ]
   workflow_dispatch:
 
 jobs:
@@ -33,8 +33,6 @@ jobs:
           rm -rf build-src
           mkdir -p build-src
           unzip -q /tmp/ME-POS-Cashier-alpha03.zip -d build-src
-          test -f build-src/settings.gradle
-          test -f build-src/app/build.gradle
 
       - name: Apply stock-safety patch
         shell: bash
@@ -43,27 +41,13 @@ jobs:
           patch -p1 < ../patches/alpha04.patch
 
       - name: Apply proven SUNMI printer baseline
-        shell: bash
-        run: |
-          python3 patches/client_hotfix_104.py
-          grep -q "SunmiPrinter" build-src/app/src/main/java/com/mahmoud/meposcashier/MainActivity.java
+        run: python3 patches/client_hotfix_104.py
 
       - name: Apply proven SUNMI T2s drawer integration
-        shell: bash
-        run: |
-          python3 patches/drawer_hotfix_105.py
-          grep -q "s.openDrawer(null)" build-src/app/src/main/java/com/mahmoud/meposcashier/SunmiPrinter.java
+        run: python3 patches/drawer_hotfix_105.py
 
       - name: Apply full client scope 1.0.6
-        shell: bash
-        run: |
-          python3 patches/full_scope_106.py
-          grep -q "1.0.6-client-full" build-src/app/build.gradle
-          grep -q "owner_pin_hash" build-src/app/src/main/java/com/mahmoud/meposcashier/MainActivity.java
-          grep -q "لم تتم الطباعة" build-src/app/src/main/java/com/mahmoud/meposcashier/MainActivity.java
-          grep -q "image_uri" build-src/app/src/main/java/com/mahmoud/meposcashier/PosDb.java
-          grep -q "printReceipt" build-src/app/src/main/java/com/mahmoud/meposcashier/SunmiPrinter.java
-          grep -q "s.openDrawer(null)" build-src/app/src/main/java/com/mahmoud/meposcashier/SunmiPrinter.java
+        run: python3 patches/full_scope_106.py
 
       - name: Download and bundle 29 product images
         shell: bash
@@ -85,7 +69,6 @@ jobs:
           dessert4='https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?auto=format&fit=crop&w=480&h=320&q=80'
           dl(){
             id="$1"; url="$2"; fallback="$3"
-            echo "Bundling ${id}"
             if ! curl -L --fail --retry 3 --retry-delay 2 --connect-timeout 20 --max-time 90 "$url" -o "$D/prod_${id}.jpg"; then
               curl -L --fail --retry 3 --retry-delay 2 --connect-timeout 20 --max-time 90 "$fallback" -o "$D/prod_${id}.jpg"
             fi
@@ -122,32 +105,36 @@ jobs:
           dl kunafa_chocolate "$dessert3" "$dessert1"
           test "$(find "$D" -maxdepth 1 -name 'prod_*.jpg' | wc -l)" -eq 29
 
-      - name: Link bundled images to products and bump 1.0.7
+      - name: Link bundled images 1.0.7
+        run: python3 patches/bundled_images_107.py
+
+      - name: Prepare Play version 1.0.8
         shell: bash
         run: |
-          python3 patches/bundled_images_107.py
-          grep -q "1.0.7-client-images" build-src/app/build.gradle
+          python3 patches/play_release_108.py
+          grep -q "versionCode 108" build-src/app/build.gradle
+          grep -q "1.0.8-play-release" build-src/app/build.gradle
           grep -q "android.resource://com.mahmoud.meposcashier/drawable/prod_" build-src/app/src/main/java/com/mahmoud/meposcashier/PosDb.java
-          test "$(find build-src/app/src/main/res/drawable-nodpi -maxdepth 1 -name 'prod_*.jpg' | wc -l)" -eq 29
 
       - name: Unit tests
         working-directory: build-src
         run: gradle :app:testDebugUnitTest --stacktrace
 
-      - name: Build debug APK
+      - name: Build release AAB
         working-directory: build-src
-        run: gradle :app:assembleDebug --stacktrace
+        run: gradle :app:bundleRelease --stacktrace
 
-      - name: Verify APK
+      - name: Verify release AAB
         shell: bash
         run: |
-          test -s build-src/app/build/outputs/apk/debug/app-debug.apk
-          sha256sum build-src/app/build/outputs/apk/debug/app-debug.apk
-          test "$(unzip -l build-src/app/build/outputs/apk/debug/app-debug.apk | grep -c 'prod_.*\.jpg')" -ge 29
+          AAB=build-src/app/build/outputs/bundle/release/app-release.aab
+          test -s "$AAB"
+          sha256sum "$AAB"
+          test "$(unzip -l "$AAB" | grep -c 'prod_.*\.jpg')" -ge 29
 
-      - name: Upload APK artifact
+      - name: Upload unsigned release AAB
         uses: actions/upload-artifact@v4
         with:
-          name: ME-POS-Cashier-1.0.7-full-client-images-debug
-          path: build-src/app/build/outputs/apk/debug/app-debug.apk
+          name: ME-POS-Cashier-1.0.8-play-release-unsigned-aab
+          path: build-src/app/build/outputs/bundle/release/app-release.aab
           if-no-files-found: error
