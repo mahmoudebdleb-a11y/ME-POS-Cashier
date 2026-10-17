@@ -157,3 +157,61 @@ jobs:
           name: ME-POS-Cashier-sale-items-hotfix-debug
           path: build-src/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
+
+  android-emulator-smoke:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Enable KVM for Android emulator
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Download tested debug APK
+        uses: actions/download-artifact@v4
+        with:
+          name: ME-POS-Cashier-sale-items-hotfix-debug
+          path: apk
+
+      - name: Boot Android emulator and smoke-test APK
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 28
+          target: google_apis
+          arch: x86_64
+          profile: pixel_2
+          ram-size: 2048M
+          heap-size: 256M
+          disk-size: 4096M
+          disable-animations: true
+          emulator-options: -no-window -no-audio -no-snapshot -gpu swiftshader_indirect
+          script: |
+            set -euo pipefail
+            adb wait-for-device
+            adb shell getprop sys.boot_completed
+            adb install -r apk/app-debug.apk
+            PKG=com.mahmoud.meposcashier
+            adb logcat -c
+            adb shell monkey -p "$PKG" -c android.intent.category.LAUNCHER 1
+            sleep 12
+            adb shell dumpsys activity activities | grep -E 'mResumedActivity|topResumedActivity' || true
+            adb shell pidof "$PKG" | tee /tmp/cashier-pid
+            test -s /tmp/cashier-pid
+            adb logcat -d -v brief > /tmp/cashier-logcat.txt
+            if grep -A 12 'FATAL EXCEPTION' /tmp/cashier-logcat.txt | grep -q "$PKG"; then
+              echo 'FAIL: cashier fatal exception on startup'
+              exit 1
+            fi
+            adb shell screencap -p /sdcard/cashier-smoke.png
+            adb pull /sdcard/cashier-smoke.png cashier-smoke.png
+            echo 'PASS: cashier installed, launched and remained running on Android 9 emulator'
+
+      - name: Upload emulator screenshot
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cashier-android9-smoke-screenshot
+          path: cashier-smoke.png
+          if-no-files-found: ignore
