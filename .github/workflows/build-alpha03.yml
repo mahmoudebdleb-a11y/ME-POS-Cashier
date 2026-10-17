@@ -1,8 +1,8 @@
-name: Build ME POS Cashier 1.0.7 Full Client Images
+name: Build ME POS Cashier Checkout Hotfix
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, 'fix/cashier-sale-items-20261017' ]
   workflow_dispatch:
 
 jobs:
@@ -130,6 +130,12 @@ jobs:
           grep -q "android.resource://com.mahmoud.meposcashier/drawable/prod_" build-src/app/src/main/java/com/mahmoud/meposcashier/PosDb.java
           test "$(find build-src/app/src/main/res/drawable-nodpi -maxdepth 1 -name 'prod_*.jpg' | wc -l)" -eq 29
 
+      - name: Fix nine-column sale_items checkout insert
+        shell: bash
+        run: |
+          python3 patches/fix_sale_items_108.py
+          grep -q 'INSERT INTO sale_items(id,sale_id,product_id,product_name,qty,unit_price_minor,line_total_minor)' build-src/app/src/main/java/com/mahmoud/meposcashier/PosDb.java
+
       - name: Unit tests
         working-directory: build-src
         run: gradle :app:testDebugUnitTest --stacktrace
@@ -148,6 +154,6 @@ jobs:
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ME-POS-Cashier-1.0.7-full-client-images-debug
+          name: ME-POS-Cashier-sale-items-hotfix-debug
           path: build-src/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
