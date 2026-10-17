@@ -188,7 +188,7 @@ jobs:
           disable-animations: true
           emulator-options: -no-window -no-audio -no-snapshot -gpu swiftshader_indirect
           script: |
-            set -euo pipefail
+            set -eu
             adb wait-for-device
             adb shell getprop sys.boot_completed
             adb install -r apk/app-debug.apk
