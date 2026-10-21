@@ -199,6 +199,23 @@ jobs:
             adb pull /sdcard/cashier-smoke.png cashier-smoke.png &&
             echo 'PASS: APK installed and cashier process running on Android 9 emulator'
 
+      - name: Collect emulator crash logs
+        if: always()
+        shell: bash
+        run: |
+          adb logcat -d -v time > cashier-emulator-logcat.txt || true
+          grep -Ei 'FATAL EXCEPTION|SQLiteException|AndroidRuntime|sale_items' cashier-emulator-logcat.txt > cashier-crash-extract.txt || true
+
+      - name: Upload emulator diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cashier-android9-logcat
+          path: |
+            cashier-emulator-logcat.txt
+            cashier-crash-extract.txt
+          if-no-files-found: ignore
+
       - name: Upload emulator screenshot
         if: always()
         uses: actions/upload-artifact@v4
