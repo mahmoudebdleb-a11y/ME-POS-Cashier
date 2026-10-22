@@ -17,7 +17,7 @@ assert sum(bool(p.get("variants")) for p in catalog)==4
 assert all(p["price_minor"]>0 and p["stock_qty"]==0 for p in catalog)
 shutil.copyfile("catalog/official_fresh_28.json",assets/"catalog_official_fresh.json")
 s=db.read_text(encoding="utf-8")
-old="seed(db); importCatalogV4(db);"
+old="seed(db);"
 if s.count(old)!=1:
     raise SystemExit("FRESH28_ONCREATE_ANCHOR_MISSING")
 s=s.replace(old,"importOfficialFresh(db);",1)
