@@ -1,0 +1,322 @@
+[
+  {
+    "id": "official_01",
+    "name": "قهوة اليوم",
+    "category": "القهوة الساخنة",
+    "price_minor": 500,
+    "stock_qty": 0,
+    "low_stock": 5,
+    "active": 1,
+    "image_uri": "android.resource://com.mahmoud.meposcashier/drawable/prod_hot_today"
+  },
+  {
+    "id": "official_02",
+    "name": "كورتادو",
+    "category": "القهوة الساخنة",
+    "price_minor": 600,
+    "stock_qty": 0,
+    "low_stock": 5,
+    "active": 1,
+    "image_uri": "android.resource://com.mahmoud.meposcashier/drawable/prod_cortado"
+  },
+  {
+    "id": "official_03",
+    "name": "قهوة تركية",
+    "category": "القهوة الساخنة",
+    "price_minor": 700,
+    "stock_qty": 0,
+    "low_stock": 5,
+    "active": 1,
+    "image_uri": "android.resource://com.mahmoud.meposcashier/drawable/prod_turkish"
+  },
+  {
+    "id": "official_04",
+    "name": "إسبريسو",
+    "category": "القهوة الساخنة",
+    "price_minor": 500,
+    "stock_qty": 0,
+    "low_stock": 5,
+    "active": 1,
+    "image_uri": "android.resource://com.mahmoud.meposcashier/drawable/prod_espresso"
+  },
+  {
+    "id": "official_05",
+    "name": "فلات وايت",
+    "category": "القهوة الساخنة",
+    "price_minor": 700,
+    "stock_qty": 0,
+    "low_stock": 5,
+    "active": 1,
+    "image_uri": "android.resource://com.mahmoud.meposcashier/drawable/prod_flat_white"
+  },
+  {
+    "id": "official_06",
+    "name": "قهوة أمريكانو",
+    "category": "القهوة الساخنة",
+    "price_minor": 600,
+    "stock_qty": 0,
+    "low_stock": 5,
+    "active": 1,
+    "image_uri": "android.resource://com.mahmoud.meposcashier/drawable/prod_americano_hot"
+  },
+  {
+    "id": "official_07",
+    "name": "كابتشينو",
+    "category": "القهوة الساخنة",
+    "price_minor": 700,
+    "stock_qty": 0,
+    "low_stock": 5,
+    "active": 1,
+    "image_uri": "android.resource://com.mahmoud.meposcashier/drawable/prod_cappuccino"
+  },
+  {
+    "id": "official_08",
+    "name": "لاتيه",
+    "category": "القهوة الساخنة",
+    "price_minor": 700,
+    "stock_qty": 0,
+    "low_stock": 5,
+    "active": 1,
+    "image_uri": "android.resource://com.mahmoud.meposcashier/drawable/prod_latte_client"
+  },
+  {
+    "id": "official_09",
+    "name": "هوت شوكلت",
+    "category": "القهوة الساخنة",
+    "price_minor": 700,
+    "stock_qty": 0,
+    "low_stock": 5,
+    "active": 1,
+    "image_uri": "android.resource://com.mahmoud.meposcashier/drawable/prod_hot_chocolate"
+  },
+  {
+    "id": "official_10",
+    "name": "قهوة V60",
+    "category": "القهوة الساخنة",
+    "price_minor": 1200,
+    "stock_qty": 0,
+    "low_stock": 5,
+    "active": 1,
+    "image_uri": "android.resource://com.mahmoud.meposcashier/drawable/prod_v60"
+  },
+  {
+    "id": "official_11",
+    "name": "قهوة اليوم بارد",
+    "category": "المشروبات الباردة",
+    "price_minor": 500,
+    "stock_qty": 0,
+    "low_stock": 5,
+    "active": 1,
+    "image_uri": "android.resource://com.mahmoud.meposcashier/drawable/prod_cold_today"
+  },
+  {
+    "id": "official_12",
+    "name": "آيس كركديه",
+    "category": "المشروبات الباردة",
+    "price_minor": 500,
+    "stock_qty": 0,
+    "low_stock": 5,
+    "active": 1,
+    "image_uri": "android.resource://com.mahmoud.meposcashier/drawable/prod_hibiscus_small",
+    "variants": [
+      {
+        "label": "صغير",
+        "price_minor": 500
+      },
+      {
+        "label": "كبير",
+        "price_minor": 800
+      }
+    ]
+  },
+  {
+    "id": "official_13",
+    "name": "آيس سبانش لاتيه",
+    "category": "المشروبات الباردة",
+    "price_minor": 1200,
+    "stock_qty": 0,
+    "low_stock": 5,
+    "active": 1,
+    "image_uri": "android.resource://com.mahmoud.meposcashier/drawable/prod_spanish_latte"
+  },
+  {
+    "id": "official_14",
+    "name": "آيس كراميل لاتيه",
+    "category": "المشروبات الباردة",
+    "price_minor": 1000,
+    "stock_qty": 0,
+    "low_stock": 5,
+    "active": 1,
+    "image_uri": "android.resource://com.mahmoud.meposcashier/drawable/prod_caramel_latte"
+  },
+  {
+    "id": "official_15",
+    "name": "آيس لاتيه",
+    "category": "المشروبات الباردة",
+    "price_minor": 1000,
+    "stock_qty": 0,
+    "low_stock": 5,
+    "active": 1,
+    "image_uri": "android.resource://com.mahmoud.meposcashier/drawable/prod_ice_latte"
+  },
+  {
+    "id": "official_16",
+    "name": "آيس أمريكانو",
+    "category": "المشروبات الباردة",
+    "price_minor": 800,
+    "stock_qty": 0,
+    "low_stock": 5,
+    "active": 1,
+    "image_uri": "android.resource://com.mahmoud.meposcashier/drawable/prod_ice_americano"
+  },
+  {
+    "id": "official_17",
+    "name": "ماتشا وايت موكا",
+    "category": "المشروبات الباردة",
+    "price_minor": 1200,
+    "stock_qty": 0,
+    "low_stock": 5,
+    "active": 1,
+    "image_uri": "android.resource://com.mahmoud.meposcashier/drawable/prod_matcha_white_mocha"
+  },
+  {
+    "id": "official_18",
+    "name": "مخلوط موهيتو",
+    "category": "المشروبات الباردة",
+    "price_minor": 1200,
+    "stock_qty": 0,
+    "low_stock": 5,
+    "active": 1,
+    "image_uri": "android.resource://com.mahmoud.meposcashier/drawable/prod_mojito_mix",
+    "variants": [
+      {
+        "label": "توت أزرق",
+        "price_minor": 1200
+      },
+      {
+        "label": "فراولة",
+        "price_minor": 1200
+      }
+    ]
+  },
+  {
+    "id": "official_19",
+    "name": "شاي",
+    "category": "المشروبات الباردة",
+    "price_minor": 200,
+    "stock_qty": 0,
+    "low_stock": 5,
+    "active": 1,
+    "image_uri": "android.resource://com.mahmoud.meposcashier/drawable/prod_tea_client"
+  },
+  {
+    "id": "official_20",
+    "name": "تراميسو توت أزرق",
+    "category": "الحلويات",
+    "price_minor": 1200,
+    "stock_qty": 0,
+    "low_stock": 5,
+    "active": 1,
+    "image_uri": "android.resource://com.mahmoud.meposcashier/drawable/prod_tiramisu_blueberry"
+  },
+  {
+    "id": "official_21",
+    "name": "تراميسو كلاسيك",
+    "category": "الحلويات",
+    "price_minor": 1200,
+    "stock_qty": 0,
+    "low_stock": 5,
+    "active": 1,
+    "image_uri": "android.resource://com.mahmoud.meposcashier/drawable/prod_tiramisu_classic"
+  },
+  {
+    "id": "official_22",
+    "name": "تراميسو توت أزرق بجوز الهند",
+    "category": "الحلويات",
+    "price_minor": 1200,
+    "stock_qty": 0,
+    "low_stock": 5,
+    "active": 1,
+    "image_uri": "android.resource://com.mahmoud.meposcashier/drawable/prod_tiramisu_coconut"
+  },
+  {
+    "id": "official_23",
+    "name": "دوناتس كيك",
+    "category": "الحلويات",
+    "price_minor": 900,
+    "stock_qty": 0,
+    "low_stock": 5,
+    "active": 1,
+    "image_uri": "android.resource://com.mahmoud.meposcashier/drawable/prod_donuts_cake"
+  },
+  {
+    "id": "official_24",
+    "name": "تشو كيز",
+    "category": "الحلويات",
+    "price_minor": 700,
+    "stock_qty": 0,
+    "low_stock": 5,
+    "active": 1,
+    "image_uri": "android.resource://com.mahmoud.meposcashier/drawable/prod_cho_keez"
+  },
+  {
+    "id": "official_25",
+    "name": "بان كيك",
+    "category": "الحلويات",
+    "price_minor": 900,
+    "stock_qty": 0,
+    "low_stock": 5,
+    "active": 1,
+    "image_uri": "android.resource://com.mahmoud.meposcashier/drawable/prod_pancake",
+    "variants": [
+      {
+        "label": "شوكولاتة",
+        "price_minor": 900
+      },
+      {
+        "label": "بستاشيو",
+        "price_minor": 900
+      }
+    ]
+  },
+  {
+    "id": "official_26",
+    "name": "وافل",
+    "category": "الحلويات",
+    "price_minor": 900,
+    "stock_qty": 0,
+    "low_stock": 5,
+    "active": 1,
+    "image_uri": "android.resource://com.mahmoud.meposcashier/drawable/prod_waffle",
+    "variants": [
+      {
+        "label": "شوكولاتة",
+        "price_minor": 900
+      },
+      {
+        "label": "بستاشيو",
+        "price_minor": 900
+      }
+    ]
+  },
+  {
+    "id": "official_27",
+    "name": "كنافة بالقشطة",
+    "category": "الحلويات",
+    "price_minor": 700,
+    "stock_qty": 0,
+    "low_stock": 5,
+    "active": 1,
+    "image_uri": "android.resource://com.mahmoud.meposcashier/drawable/prod_kunafa_cream"
+  },
+  {
+    "id": "official_28",
+    "name": "كنافة بالشوكولاتة",
+    "category": "الحلويات",
+    "price_minor": 900,
+    "stock_qty": 0,
+    "low_stock": 5,
+    "active": 1,
+    "image_uri": "android.resource://com.mahmoud.meposcashier/drawable/prod_kunafa_chocolate"
+  }
+]
