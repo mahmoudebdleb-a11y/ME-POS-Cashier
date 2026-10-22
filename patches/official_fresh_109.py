@@ -24,11 +24,11 @@ s=s.replace(old,"importOfficialFresh(db);",1)
 # SQLiteOpenHelper exposes getReadableDatabase but not its construction context.
 # Preserve the constructor argument via a stable, class-local field.
 import re
-class_match=re.search(r"(?m)^\\s*(?:public\\s+)?(?:final\\s+)?class\\s+PosDb\\s+extends\\s+SQLiteOpenHelper\\s*\\{",s)
+class_match=re.search(r"(?m)^\s*(?:public\s+)?(?:final\s+)?class\s+PosDb\s+extends\s+SQLiteOpenHelper\s*\{",s)
 if not class_match:
     raise SystemExit("FRESH28_CLASS_ANCHOR_MISSING")
-s=s[:class_match.end()]+"\\n    private final android.content.Context officialFreshContext;"+s[class_match.end():]
-ctor_match=re.search(r"super\\s*\\(\\s*context\\s*,[^;]*\\);",s)
+s=s[:class_match.end()]+"\n    private final android.content.Context officialFreshContext;"+s[class_match.end():]
+ctor_match=re.search(r"super\s*\(\s*context\s*,[^;]*\);",s)
 if not ctor_match:
     raise SystemExit("FRESH28_CONSTRUCTOR_ANCHOR_MISSING")
 s=s[:ctor_match.end()]+" officialFreshContext=context.getApplicationContext();"+s[ctor_match.end():]
