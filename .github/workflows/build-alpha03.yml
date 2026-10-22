@@ -264,7 +264,7 @@ jobs:
         if: always()
         shell: bash
         run: |
-          adb logcat -d -v time > cashier-emulator-logcat.txt || true
+          timeout 25s adb logcat -d -v time > cashier-emulator-logcat.txt || true
           grep -Ei 'FATAL EXCEPTION|SQLiteException|AndroidRuntime|sale_items' cashier-emulator-logcat.txt > cashier-crash-extract.txt || true
 
       - name: Upload emulator diagnostics
