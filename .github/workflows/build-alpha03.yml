@@ -145,10 +145,10 @@ jobs:
           from pathlib import Path
 
           source = Path("build-src/app/src/main/java/com/mahmoud/meposcashier/PosDb.java").read_text(encoding="utf-8")
-          match = re.search(r'INSERT INTO sale_items\([^"]+?\) VALUES\(\?,\?,\?,\?,\?,\?,\?\)', source)
-          if not match:
+          sql = ("INSERT INTO sale_items(id,sale_id,product_id,product_name,qty,unit_price_minor,line_total_minor)"
+                 " VALUES(?,?,?,?,?,?,?)")
+          if sql not in source:
               raise SystemExit("FAIL: explicit-column checkout insert not found")
-          sql = match.group(0)
           con = sqlite3.connect(":memory:")
           con.execute("""
               CREATE TABLE sale_items(
