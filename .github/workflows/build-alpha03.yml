@@ -256,6 +256,8 @@ jobs:
             adb shell monkey -p com.mahmoud.meposcashier -c android.intent.category.LAUNCHER 1 &&
             sleep 12 &&
             adb shell pidof com.mahmoud.meposcashier &&
+            adb logcat -d -v time -t 500 > cashier-emulator-logcat.txt &&
+            test -s cashier-emulator-logcat.txt &&
             adb shell screencap -p /sdcard/cashier-smoke.png &&
             adb pull /sdcard/cashier-smoke.png cashier-smoke.png &&
             echo 'PASS: APK installed and cashier process running on Android 9 emulator'
@@ -264,7 +266,7 @@ jobs:
         if: always()
         shell: bash
         run: |
-          timeout 25s adb logcat -d -v time > cashier-emulator-logcat.txt || true
+          test -s cashier-emulator-logcat.txt || echo 'WARNING: emulator logcat missing or empty'
           grep -Ei 'FATAL EXCEPTION|SQLiteException|AndroidRuntime|sale_items' cashier-emulator-logcat.txt > cashier-crash-extract.txt || true
 
       - name: Upload emulator diagnostics
