@@ -21,12 +21,20 @@ old="seed(db);"
 if s.count(old)!=1:
     raise SystemExit("FRESH28_ONCREATE_ANCHOR_MISSING")
 s=s.replace(old,"importOfficialFresh(db);",1)
+context_anchor="public class PosDb extends SQLiteOpenHelper {"
+if context_anchor not in s:
+    raise SystemExit("FRESH28_CLASS_ANCHOR_MISSING")
+s=s.replace(context_anchor,context_anchor+"\\n    private final android.content.Context officialFreshContext;",1)
+import re
+s,count=re.subn(r"(super\\(context,[^;]*;)",r"\\1 officialFreshContext=context.getApplicationContext();",s,count=1)
+if count!=1:
+    raise SystemExit("FRESH28_CONSTRUCTOR_ANCHOR_MISSING")
 anchor="    private void seed(SQLiteDatabase db){"
 if s.count(anchor)!=1:
     raise SystemExit("FRESH28_SEED_METHOD_ANCHOR_MISSING")
 method='''    private void importOfficialFresh(SQLiteDatabase db){
         try {
-            java.io.InputStream in=appContext.getAssets().open("catalog_official_fresh.json");
+            java.io.InputStream in=officialFreshContext.getAssets().open("catalog_official_fresh.json");
             java.io.ByteArrayOutputStream out=new java.io.ByteArrayOutputStream();
             byte[] buf=new byte[4096]; int n;
             while((n=in.read(buf))>0)out.write(buf,0,n);
