@@ -246,7 +246,6 @@ jobs:
           ram-size: 2048M
           heap-size: 256M
           disk-size: 4096M
-          emulator-build: stable
           disable-animations: true
           emulator-options: -no-window -no-audio -no-snapshot -gpu swiftshader_indirect
           script: >-
