@@ -136,6 +136,39 @@ jobs:
           python3 patches/fix_sale_items_108.py
           grep -q 'INSERT INTO sale_items(id,sale_id,product_id,product_name,qty,unit_price_minor,line_total_minor)' build-src/app/src/main/java/com/mahmoud/meposcashier/PosDb.java
 
+      - name: Regression test - checkout sale_items SQL against nine-column database
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import re
+          import sqlite3
+          from pathlib import Path
+
+          source = Path("build-src/app/src/main/java/com/mahmoud/meposcashier/PosDb.java").read_text(encoding="utf-8")
+          match = re.search(r'INSERT INTO sale_items\([^"]+?\) VALUES\(\?,\?,\?,\?,\?,\?,\?\)', source)
+          if not match:
+              raise SystemExit("FAIL: explicit-column checkout insert not found")
+          sql = match.group(0)
+          con = sqlite3.connect(":memory:")
+          con.execute("""
+              CREATE TABLE sale_items(
+                  id TEXT PRIMARY KEY,
+                  sale_id TEXT NOT NULL,
+                  product_id TEXT NOT NULL,
+                  product_name TEXT NOT NULL,
+                  qty INTEGER NOT NULL,
+                  unit_price_minor INTEGER NOT NULL,
+                  line_total_minor INTEGER NOT NULL,
+                  printed INTEGER NOT NULL DEFAULT 0,
+                  visible INTEGER NOT NULL DEFAULT 1
+              )
+          """)
+          con.execute(sql, ("item1", "sale1", "product1", "Coffee", 2, 1500, 3000))
+          row = con.execute("SELECT qty, line_total_minor, printed, visible FROM sale_items WHERE id='item1'").fetchone()
+          assert row == (2, 3000, 0, 1), row
+          print("PASS: checkout insert persists seven supplied values and two database defaults")
+          PY
+
       - name: Unit tests
         working-directory: build-src
         run: gradle :app:testDebugUnitTest --stacktrace
