@@ -233,7 +233,7 @@ jobs:
       - name: Download tested debug APK
         uses: actions/download-artifact@v4
         with:
-          name: ME-POS-Cashier-sale-items-hotfix-debug
+          name: ME-POS-Cashier-fresh28-cloud-debug
           path: apk
 
       - name: Boot Android emulator and smoke-test APK
