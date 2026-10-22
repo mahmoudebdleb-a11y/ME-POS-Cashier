@@ -24,7 +24,7 @@ s=s.replace(old,"importOfficialFresh(db);",1)
 context_anchor="public class PosDb extends SQLiteOpenHelper {"
 if context_anchor not in s:
     raise SystemExit("FRESH28_CLASS_ANCHOR_MISSING")
-s=s.replace(context_anchor,context_anchor+"\\n    private final android.content.Context officialFreshContext;",1)
+s=s.replace(context_anchor,context_anchor+"\n    private final android.content.Context officialFreshContext;",1)
 import re
 s,count=re.subn(r"(super\\(context,[^;]*;)",r"\\1 officialFreshContext=context.getApplicationContext();",s,count=1)
 if count!=1:
