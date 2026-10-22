@@ -5,9 +5,17 @@ on:
     branches: [ main, 'fix/cashier-sale-items-20261017' ]
   workflow_dispatch:
 
+permissions:
+  contents: read
+
+concurrency:
+  group: cashier-cloud-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 40
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -22,6 +30,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
+          cache-read-only: false
 
       - name: Reassemble verified Alpha 03 baseline
         shell: bash
@@ -190,6 +199,18 @@ jobs:
           name: ME-POS-Cashier-sale-items-hotfix-debug
           path: build-src/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
+          retention-days: 14
+
+      - name: Upload cloud build diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cashier-cloud-build-diagnostics
+          path: |
+            build-src/app/build/reports/**
+            build-src/app/build/test-results/**
+          if-no-files-found: ignore
+          retention-days: 14
 
   android-emulator-smoke:
     needs: build
@@ -218,6 +239,7 @@ jobs:
           ram-size: 2048M
           heap-size: 256M
           disk-size: 4096M
+          emulator-build: stable
           disable-animations: true
           emulator-options: -no-window -no-audio -no-snapshot -gpu swiftshader_indirect
           script: >-
@@ -244,6 +266,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: cashier-android9-logcat
+          retention-days: 14
           path: |
             cashier-emulator-logcat.txt
             cashier-crash-extract.txt
@@ -254,5 +277,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: cashier-android9-smoke-screenshot
+          retention-days: 14
           path: cashier-smoke.png
           if-no-files-found: ignore
