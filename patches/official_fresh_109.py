@@ -25,10 +25,10 @@ context_anchor="public class PosDb extends SQLiteOpenHelper {"
 if context_anchor not in s:
     raise SystemExit("FRESH28_CLASS_ANCHOR_MISSING")
 s=s.replace(context_anchor,context_anchor+"\n    private final android.content.Context officialFreshContext;",1)
-import re
-s,count=re.subn(r"(super\\(context,[^;]*;)",r"\\1 officialFreshContext=context.getApplicationContext();",s,count=1)
-if count!=1:
+constructor_anchor="super(context, DB_NAME, null, DB_VERSION);"
+if s.count(constructor_anchor)!=1:
     raise SystemExit("FRESH28_CONSTRUCTOR_ANCHOR_MISSING")
+s=s.replace(constructor_anchor,constructor_anchor+" officialFreshContext=context.getApplicationContext();",1)
 anchor="    private void seed(SQLiteDatabase db){"
 if s.count(anchor)!=1:
     raise SystemExit("FRESH28_SEED_METHOD_ANCHOR_MISSING")
