@@ -21,14 +21,17 @@ old="seed(db);"
 if s.count(old)!=1:
     raise SystemExit("FRESH28_ONCREATE_ANCHOR_MISSING")
 s=s.replace(old,"importOfficialFresh(db);",1)
-context_anchor="public class PosDb extends SQLiteOpenHelper {"
-if context_anchor not in s:
+# SQLiteOpenHelper exposes getReadableDatabase but not its construction context.
+# Preserve the constructor argument via a stable, class-local field.
+import re
+class_match=re.search(r"(?m)^\\s*(?:public\\s+)?(?:final\\s+)?class\\s+PosDb\\s+extends\\s+SQLiteOpenHelper\\s*\\{",s)
+if not class_match:
     raise SystemExit("FRESH28_CLASS_ANCHOR_MISSING")
-s=s.replace(context_anchor,context_anchor+"\n    private final android.content.Context officialFreshContext;",1)
-constructor_anchor="super(context, DB_NAME, null, DB_VERSION);"
-if s.count(constructor_anchor)!=1:
+s=s[:class_match.end()]+"\\n    private final android.content.Context officialFreshContext;"+s[class_match.end():]
+ctor_match=re.search(r"super\\s*\\(\\s*context\\s*,[^;]*\\);",s)
+if not ctor_match:
     raise SystemExit("FRESH28_CONSTRUCTOR_ANCHOR_MISSING")
-s=s.replace(constructor_anchor,constructor_anchor+" officialFreshContext=context.getApplicationContext();",1)
+s=s[:ctor_match.end()]+" officialFreshContext=context.getApplicationContext();"+s[ctor_match.end():]
 anchor="    private void seed(SQLiteDatabase db){"
 if s.count(anchor)!=1:
     raise SystemExit("FRESH28_SEED_METHOD_ANCHOR_MISSING")
